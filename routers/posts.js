@@ -52,4 +52,26 @@ router.get("/get_latest_post", async (req, res) => {
   }
 });
 
+// ユーザの投稿内容のみを取得
+router.get("/:userId", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const userPosts = await prisma.post.findMany({
+      where: {
+        authorId: parseInt(userId),
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        author: true,
+      },
+    });
+    res.status(200).json(userPosts);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "サーバエラーです" });
+  }
+});
+
 module.exports = router;
